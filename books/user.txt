@@ -1,0 +1,1 @@
+[User {uID = 1, uName = "alex", role = Guest, pass = "123", borrow = [Book {bID = 4, bName = "CLR via C#", cate = "C#", num = 5},Book {bID = 2, bName = "JavaScript\26694\26550\35774\35745", cate = "javaScript", num = 5}]},User {uID = 0, uName = "admin", role = Admin, pass = "8888", borrow = []}]
