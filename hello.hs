@@ -343,7 +343,7 @@ renderGreeting = do
     f<- local("Mr an Mrs. " ++ )footT
     return $ h ++ b ++ f
 
--- 使用runReaderT将里面的函数提取出来
+-- 依次用使用 runIdentity 和 runReaderT 将结果提取出来
 greet::String
 greet = runIdentity $ runReaderT renderGreeting "david"
 
@@ -383,7 +383,7 @@ gcd' a b
 -- fst $ runWriter (gcd' 8 3)
 
 {- MondState -}
--- State s a 与 s -> s' 是同构
+-- State s a 与 s -> (a,s') 是同构
 -- newtype State s a = State { runState::s -> (a,s)}
 -- trace:调试打印，traceM 是 trace 的 monadic 版本
 intState :: State Int ()  
@@ -458,7 +458,10 @@ caculator = do
 
 op ::IO(a,Double)
 op = runStateT (forever caculator) 0
-        
+-- > +1
+-- > /2
+-- > *3
+
 {- ============== codewars ============= -}
 {- 歌词解码 -}
 -- songDecoder'::String->String
