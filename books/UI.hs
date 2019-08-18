@@ -140,6 +140,7 @@ findLen key list = case Map.lookup key (Map.fromList list) of
   Nothing -> 10
   Just i -> i
 
+showUser::Foldable t => t User -> IO ()
 showUser users = do
     putStrLn $ ths >>= \(n,l) -> n ++ replicate (length n `subtract` l) ' '
     putStrLn $ replicate 60 '-'
@@ -160,6 +161,7 @@ showUser users = do
         --   borrowBooks books = intercalate " | " (foldr (\Book {bName=name} x -> name:x) [] books)
         --   borrowBooks books = intercalate " | " [ name | Book{bName = name} <- books]
 
+showBook::Foldable t => t Book -> IO ()
 showBook books = do
     putStrLn $ ths >>= \(n,l) -> n ++ replicate (length n `subtract` l) ' '
     putStrLn $ replicate 70 '-'
