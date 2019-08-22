@@ -21,7 +21,10 @@ import           System.IO
 import           System.IO.Error
 import           System.Directory
 import           Control.Monad
+import           Control.Monad.Writer
+import           Control.Monad.Trans.Maybe
 import           Text.Regex.Posix
+
 
 data Book = Book {
    bID::Int,
@@ -34,7 +37,7 @@ data User = User {
    uID::Int,
    uName::String,
    role::Role,
-   pass::String,
+   password::String,
    borrow::[Book]   
 } deriving(Show,Read,Eq)
 
@@ -49,7 +52,7 @@ userPath = "user.txt"
 bookPath = "book.txt"
 
 -- 初始数据
-initUsers = [User{uID=0,uName="admin",role=Admin,pass="8888",borrow=[]}]
+initUsers = [User{uID=0,uName="admin",role=Admin,password="8888",borrow=[]}]
 initBooks = [Book{bID=0,bName="Learn You a Haskell for Great Good!",cate="Haskell",num=5}
         ,Book{bID=1,bName="Real World Haskell",cate="Haskell",num=5}
         ,Book{bID=2,bName="JavaScript框架设计",cate="javaScript",num=5}
@@ -116,7 +119,7 @@ addUser::(String,String) -> IO [User]
 addUser (name,pass) = do
         users <- getUser
         let nid = head $ [1..100] \\ [id|User{uID=id} <- users]
-            user = User{uID=nid,uName=name,role=Guest,pass=pass,borrow=[]}
+            user = User{uID=nid,uName=name,role=Guest,password=pass,borrow=[]}
         saveUser $ user:users
         return [user]
 
@@ -127,7 +130,7 @@ deleteUser id = do
             Nothing -> return $ Left "User not exist !"
             Just user -> do 
                 saveUser $ [ x | User{uID=x} <- users, show x /= id ]
-                return . Right $ uName user ++ " had been Successful deleted !"        
+                return . Right $ uName user ++ " had been Successful deleted !"
 
 searchBook::String -> IO [Book]
 searchBook n = do
@@ -142,6 +145,27 @@ addBook (name,cat,n) = do
             book = Book{bID=nid,bName=name,cate=cat,num= n}
         saveBook $ book:books
         return [book]
+
+
+-- runWriterT $ delBook "2" -- 使用 monad变换器 实现，对比使用 monad组合 实现的 deleteBook
+-- delBook::String -> WriterT [(Bool,String)] IO ()
+-- delBook id = do
+--         books <- liftIO getBook
+--         case find (\Book{bID=x} -> show x == id) books of
+--             Nothing -> tell [(False,"Book not exist !")]
+--             Just book -> do 
+--                 liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
+--                 tell [(True, "《" ++ bName book ++ "》had been Successful deleted !")]
+
+-- runWriterT $ runMaybeT $ delBook "2"
+delBook::String -> MaybeT (WriterT String IO) ()
+delBook id = do
+        books <- liftIO getBook
+        case find (\Book{bID=x} -> show x == id) books of
+            Nothing -> tell "book not exist !" >> fail "oops"
+            Just book -> do
+                liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
+                tell $ "《" ++ bName book ++ "》had been Successful deleted !"
 
 deleteBook::String -> IO (Either String String)
 deleteBook id = do
