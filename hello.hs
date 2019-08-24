@@ -282,7 +282,7 @@ safe y (x:xs) n = y /= x && y /= x + n && y /= x - n && safe y xs (n + 1)
 {- ====================== 高级 =========================-}
 
 {- MonadReader -}
--- -- r 就是输入的全局参数
+-- r 就是输入的全局参数
 -- newtype Reader r a = Reader {runReader::r -> a}
 -- -- runReader m 提取出函数fun, 再 fun r 获得 a 值 
 -- instance Functor(Reader r) where
