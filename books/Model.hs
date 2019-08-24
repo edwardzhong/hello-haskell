@@ -162,7 +162,7 @@ delBook::String -> MaybeT (WriterT String IO) ()
 delBook id = do
         books <- liftIO getBook
         case find (\Book{bID=x} -> show x == id) books of
-            Nothing -> tell "book not exist !" >> fail "oops"
+            Nothing -> tell "book not exist !" >> fail "err"
             Just book -> do
                 liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
                 tell $ "《" ++ bName book ++ "》had been Successful deleted !"

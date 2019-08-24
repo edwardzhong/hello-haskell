@@ -1,5 +1,6 @@
 
 import           Data.Char
+import           Control.Applicative -- Const
 import           Control.Monad -- MonadPlus 和 guard
 import           Control.Monad.Trans.Maybe
 import           Control.Monad.Writer
@@ -10,15 +11,22 @@ isPassValid::String -> Bool
 isPassValid s = length s >= 8 && check s
         where check s = and [f s | f <- any <$> [isUpper,isLower,isNumber]]
 
-setPassword::MaybeT (WriterT String IO)()
+-- setPassword::MaybeT (WriterT String IO)()
+-- setPassword = do
+--         liftIO $ putStrLn "Please set a password"
+--         pass <- liftIO $ getLine
+--         -- when (isPassValid pass) (tell pass)
+--         guard $ isPassValid pass
+--         tell pass
+-- runWriterT $ runMaybeT  setPassword
+
+setPassword::MaybeT IO String
 setPassword = do
         liftIO $ putStrLn "Please set a password"
         pass <- liftIO $ getLine
-        -- when (isPassValid pass) (tell pass)
         guard $ isPassValid pass
-        tell pass
-
--- runWriterT $ runMaybeT  setPassword
+        return pass
+--runMaybeT setPassword
 
 push::Int -> MaybeT (State [Int]) Int
 -- push x = MaybeT $ state $ \xs -> (Just x,x:xs)
