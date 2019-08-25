@@ -1,4 +1,4 @@
-import           Control.Monad -- MonadPlus 和 guard
+import           Control.Monad -- MonadPlus , guard
 import           Control.Monad.Reader
 import           Control.Monad.Writer
 import           Control.Monad.State
@@ -7,7 +7,7 @@ import           Data.Char
 import qualified Data.Foldable        as F
 import           Data.List
 import qualified Data.Map             as Map
-import           Data.Monoid
+import           Data.Monoid -- Product , Sum
 import           System.IO
 import           System.Random
 import           Debug.Trace -- 调试用的trace 和 tarceM
