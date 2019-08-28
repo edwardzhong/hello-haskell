@@ -15,14 +15,15 @@ module Model
      ,returnBook
     ) where
 import           Control.Exception
+import           Control.Monad
+import           Control.Monad.Writer
+-- import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Maybe
 import           Data.Char
 import           Data.List
 import           System.IO
 import           System.IO.Error
 import           System.Directory
-import           Control.Monad
-import           Control.Monad.Writer
-import           Control.Monad.Trans.Maybe
 import           Text.Regex.Posix
 
 
@@ -146,6 +147,27 @@ addBook (name,cat,n) = do
         saveBook $ book:books
         return [book]
 
+-- newtype EitherT m a = EitherT { runEitherT :: m (Either a)}
+-- bindMT :: (Monad m) => EitherT m a -> (a -> EitherT m b) -> EitherT m b
+-- x `bindMT` f = EitherT $ do
+--     unwrapped <- runEitherT x
+--     case unwrapped of
+--       Left x -> return $ Left x
+--       Right y -> runEitherT (f y)
+
+-- returnMT :: (Monad m) => a -> EitherT m a
+-- returnMT a = EitherT $ return (Right a)
+
+-- failMT :: (Monad m) => a -> EitherT m a
+-- failMT x = EitherT $ return Left x
+
+-- instance (Monad m) => Monad (EitherT m) where
+--     return = returnMT
+--     (>>=) = bindMT
+--     fail = failMT
+
+-- instance MonadTrans EitherT where
+--     lift m = EitherT (Right `liftM` m)
 
 -- runWriterT $ delBook "2" -- 使用 monad变换器 实现，对比使用 monad组合 实现的 deleteBook
 -- delBook::String -> WriterT [(Bool,String)] IO ()
@@ -157,7 +179,7 @@ addBook (name,cat,n) = do
 --                 liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
 --                 tell [(True, "《" ++ bName book ++ "》had been Successful deleted !")]
 
--- runWriterT $ runMaybeT $ delBook "2"
+-- runWriterT . runMaybeT $ delBook "2"
 delBook::String -> MaybeT (WriterT String IO) ()
 delBook id = do
         books <- liftIO getBook

@@ -1,1 +1,1 @@
-[Book {bID = 0, bName = "Learn You a Haskell for Great Good!", cate = "Haskell", num = 5},Book {bID = 1, bName = "Real World Haskell", cate = "Haskell", num = 5},Book {bID = 4, bName = "CLR via C#", cate = "C#", num = 5},Book {bID = 5, bName = "ASP.NET\35774\35745\27169\24335", cate = "C#", num = 5}]
+[Book {bID = 0, bName = "Learn You a Haskell for Great Good!", cate = "Haskell", num = 5},Book {bID = 4, bName = "CLR via C#", cate = "C#", num = 5},Book {bID = 5, bName = "ASP.NET\35774\35745\27169\24335", cate = "C#", num = 5}]

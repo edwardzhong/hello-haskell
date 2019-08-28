@@ -18,7 +18,7 @@ isPassValid s = length s >= 8 && check s
 --         -- when (isPassValid pass) (tell pass)
 --         guard $ isPassValid pass
 --         tell pass
--- runWriterT $ runMaybeT  setPassword
+-- runWriterT $ runMaybeT setPassword
 
 setPassword::MaybeT IO String
 setPassword = do
