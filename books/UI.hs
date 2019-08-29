@@ -100,7 +100,6 @@ delBookUI = do
     if head id == 'e' then bookUI
     else case and . map isDigit $ id of 
          False -> putStrLn "Book ID must be Number(Int)!" >> delBookUI
-         -- True -> deleteBook id >>= \x -> if x then bookUI else delBookUI
          True -> deleteBook id >>= \x -> case x of
               Left err -> putStrLn err >> delBookUI
               Right msg -> putStrLn msg >> bookUI
@@ -130,7 +129,6 @@ borrowReturnUI f = do
                 False -> putStrLn "User ID must be Number(Int)" >> borrowReturnUI f
                 True  -> case and . map isDigit $ y of
                      False -> putStrLn "Book ID must be Number(Int)" >> borrowReturnUI f
-                     -- True  -> f (read x::Int,read y::Int) >>= \x -> if x then borrowUI else borrowReturnUI f
                      True  -> f (read x::Int,read y::Int) >>= \x -> case x of
                         Left err -> putStrLn err >> borrowUI
                         Right msg -> putStrLn msg >> borrowReturnUI f

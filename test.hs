@@ -1,11 +1,11 @@
 
-import           Data.Char
 import           Control.Applicative -- Const
 import           Control.Monad -- MonadPlus , guard
 import           Control.Monad.Trans.Maybe
 import           Control.Monad.Writer
 import           Control.Monad.State
 import           Control.Monad.Identity
+import           Data.Char
 
 isPassValid::String -> Bool
 isPassValid s = length s >= 8 && check s
