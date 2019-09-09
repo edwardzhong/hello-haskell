@@ -77,12 +77,20 @@ handler e
     | isIllegalOperation e = putStrLn "Illegal operation !"
     | otherwise = ioError e
 
+-- type Users = [User]
+-- type Books = [Book]
+-- data Datas = Users | Books
+data Datas = Users [User] | Books [Book]
+saveData::Datas -> IO ()
+saveData (Books a) = save bookPath a
+saveData (Users a) = save userPath a
 
 saveUser::Show a => a -> IO ()
 saveUser = save userPath
 
 saveBook::Show a => a -> IO ()
 saveBook = save bookPath
+
 
 -- 保存到临时文件.temp再改名,避免同时操作文件锁定的问题
 save::Show a => FilePath -> a -> IO ()
@@ -121,7 +129,7 @@ addUser (name,pass) = do
         users <- getUser
         let nid = head $ [1..100] \\ [id|User{uID=id} <- users]
             user = User{uID=nid,uName=name,role=Guest,password=pass,borrow=[]}
-        saveUser $ user:users
+        saveData $ Users $ user:users
         return [user]
 
 deleteUser::String -> IO (Either String String)
@@ -130,7 +138,8 @@ deleteUser id = do
         case find (\User{uID=x} -> show x == id) users of
             Nothing -> return $ Left "User not exist !"
             Just user -> do 
-                saveUser $ [ x | User{uID=x} <- users, show x /= id ]
+                -- saveUser  [ u | u@User{uID=x} <- users, show x /= id ]
+                saveData $ Users [ u | u@User{uID=x} <- users, show x /= id ]
                 return . Right $ uName user ++ " had been Successful deleted !"
 
 searchBook::String -> IO [Book]
@@ -144,7 +153,7 @@ addBook (name,cat,n) = do
         books <- getBook
         let nid = head $ [1..100] \\ (foldr (\Book{bID=id} x -> id:x) [] books)
             book = Book{bID=nid,bName=name,cate=cat,num= n}
-        saveBook $ book:books
+        saveData $ Books $ book:books
         return [book]
 
 -- newtype EitherT m a = EitherT { runEitherT :: m (Either a)}
@@ -186,7 +195,8 @@ delBook id = do
         case find (\Book{bID=x} -> show x == id) books of
             Nothing -> tell "book not exist !" >> fail "err"
             Just book -> do
-                liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
+                -- liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
+                liftIO $ saveData $ Books [ b | b@Book{ bID = x } <- books, show x /= id ]
                 tell $ "《" ++ bName book ++ "》had been Successful deleted !"
 
 deleteBook::String -> IO (Either String String)
@@ -213,8 +223,8 @@ borrowBook (uid,bid) = do
                     Just book -> do 
                         if num book <= 0 then return $ Left "The book has been borrowed !"
                         else do 
-                            saveBook [if id == bid then book {num = n-1} else book | book@Book {bID=id,num=n} <- books] -- 和map或<$>功能一样
-                            saveUser $ (\user@User{uID=id,borrow=bs} -> if id == uid then user{borrow = book:bs} else user) <$> users
+                            saveData $ Books [if id == bid then book {num = n-1} else book | book@Book {bID=id,num=n} <- books] -- 和map或<$>功能一样
+                            saveData $ Users $ (\user@User{uID=id,borrow=bs} -> if id == uid then user{borrow = book:bs} else user) <$> users
                             return . Right $ uName user ++ " borrow《"++ (bName book) ++ "》success!"
    
 returnBook::(Int,Int) -> IO (Either String String) 
@@ -228,7 +238,7 @@ returnBook (uid,bid) = do
                 Just index -> case find (\Book {bID=id} -> id == bid) books of
                     Nothing -> return $ Left "Book not exist !"
                     Just book -> do 
-                        saveBook [if id == bid then book {num = n+1} else book | book@Book{bID=id,num=n} <- books]
-                        saveUser [if id == uid then user {borrow = filter (\Book{bID=id} -> id /= bid) bs} else user | user@User{uID=id,borrow=bs} <- users]
+                        saveData $ Books [if id == bid then book {num = n+1} else book | book@Book{bID=id,num=n} <- books]
+                        saveData $ Users [if id == uid then user {borrow = filter (\Book{bID=id} -> id /= bid) bs} else user | user@User{uID=id,borrow=bs} <- users]
                         return . Right $ uName user ++ " return《"++ (bName book) ++ "》success!"
 

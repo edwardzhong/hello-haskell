@@ -117,7 +117,7 @@ borrowUI = renderUI borrowDispatch
 borrowBookUI = borrowReturnUI borrowBook
 returnBookUI = borrowReturnUI returnBook
 borrowReturnUI f = do 
-    putStrLn "Please Input: UserID BookIDor Exit (e) :"
+    putStrLn "Please Input: UserID BookID or Exit (e) :"
     ws <- fmap words getLine
     case ws of 
          []  -> putStrLn "There is no input !" >> borrowReturnUI f
@@ -142,7 +142,7 @@ showUser::Foldable t => t User -> IO ()
 showUser users = do
     putStrLn $ ths >>= \(n,l) -> n ++ replicate (length n `subtract` l) ' '
     putStrLn $ replicate 60 '-'
-    mapM_ (\User {uID=id,uName=name,pass=ps,role=ro,borrow=bs} -> do 
+    mapM_ (\User {uID=id,uName=name,password=ps,role=ro,borrow=bs} -> do 
         putStr $ show id
         putStr $ replicate (findLen "ID" ths - (length $ show id)) ' '
         putStr name
