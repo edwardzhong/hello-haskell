@@ -44,6 +44,10 @@ data User = User {
 
 data Role = Admin|Guest deriving(Show,Read,Eq,Ord,Bounded,Enum)
 
+-- type Users = [User]
+-- type Books = [Book]
+-- data Datas = Users | Books
+data Datas = Users [User] | Books [Book]
 
 numRegex = "^[0-9]+$"
 -- num  =~ numRegex::Bool
@@ -77,10 +81,7 @@ handler e
     | isIllegalOperation e = putStrLn "Illegal operation !"
     | otherwise = ioError e
 
--- type Users = [User]
--- type Books = [Book]
--- data Datas = Users | Books
-data Datas = Users [User] | Books [Book]
+
 saveData::Datas -> IO ()
 saveData (Books a) = save bookPath a
 saveData (Users a) = save userPath a
