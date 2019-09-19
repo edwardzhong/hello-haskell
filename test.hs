@@ -1,4 +1,5 @@
 
+{-# LANGUAGE TemplateHaskell #-}
 import           Control.Applicative -- Const
 import           Control.Monad -- MonadPlus , guard
 import           Control.Monad.Trans.Maybe
@@ -6,6 +7,9 @@ import           Control.Monad.Writer
 import           Control.Monad.State
 import           Control.Monad.Identity
 import           Data.Char
+import           Text.Parsec
+import           Language.Haskell.TH
+
 
 isPassValid::String -> Bool
 isPassValid s = length s >= 8 && check s
@@ -34,6 +38,7 @@ push x = do
         xs <- lift get
         lift $ put $ x:xs
         return x
+-- (runState $ runMaybeT $ push 1) [1,2,3]
 
 pop::MaybeT (State [Int]) Int
 -- pop = MaybeT $ state $ \xs -> case xs of
@@ -46,6 +51,7 @@ pop = do
                         lift $ put []
                         fail "err"
                 (y:ys) -> lift $ put ys >> return y
+-- (runState $ runMaybeT $ pop ) [1,2,3]
 
 stack::MaybeT (State [Int]) Int
 stack = do
@@ -62,3 +68,13 @@ guardTest a = guard (a > 5) >> putStrLn "larger than 5"
 
 whenTest :: Int -> IO ()
 whenTest a = when (a > 5) $ putStrLn "larger than 5"
+
+-- mklen:: DecsQ
+mklen::IO()
+mklen = do
+        -- TyConI (DataD _ _ [] _ cons _) <- reify ''Book
+        putStrLn $ $(reify ''Book >>= stringE .pprint)
+        -- [RecC conName fields] <- return cons
+        -- forM fields $ \(fileName,_,fileType) -> do
+            -- putStrLn (nameBase fileName) 
+        return ()

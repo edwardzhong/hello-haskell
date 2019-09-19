@@ -1,4 +1,2 @@
 hello-stack
-*.o
-*.hi
-*.txt
+*.*

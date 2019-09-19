@@ -559,5 +559,3 @@ yourOrderPlease  = unwords . sortOn(find isDigit) . words
 -- get unique number
 getUnique::[Int]->Int
 getUnique = head . concat . filter ((== 1) . length) . group . sort 
-
-

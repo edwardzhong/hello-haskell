@@ -37,12 +37,12 @@ data Book = Book {
 data User = User {
    uID::Int,
    uName::String,
-   role::Role,
+   role::Roles,
    password::String,
    borrow::[Book]   
 } deriving(Show,Read,Eq)
 
-data Role = Admin|Guest deriving(Show,Read,Eq,Ord,Bounded,Enum)
+data Roles = Admin|Guest deriving(Show,Read,Eq,Ord,Bounded,Enum)
 
 -- type Users = [User]
 -- type Books = [Book]
@@ -242,4 +242,3 @@ returnBook (uid,bid) = do
                         saveData $ Books [if id == bid then book {num = n+1} else book | book@Book{bID=id,num=n} <- books]
                         saveData $ Users [if id == uid then user {borrow = filter (\Book{bID=id} -> id /= bid) bs} else user | user@User{uID=id,borrow=bs} <- users]
                         return . Right $ uName user ++ " return《"++ (bName book) ++ "》success!"
-
