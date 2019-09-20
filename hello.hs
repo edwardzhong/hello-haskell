@@ -9,10 +9,9 @@ import           Data.List
 import qualified Data.Map             as Map
 import           Data.Monoid -- Product , Sum
 import           System.IO
-import           System.Random
+-- import           System.Random
 import           Debug.Trace -- 调试用的trace 和 tarceM
-import           Text.Regex.Posix -- 正则表达式
-import           Data.List.Split  -- splitOn 函数很有用
+-- import           Text.Regex.Posix -- 正则表达式
 import           Data.Map.Strict ((!)) -- 严格模式的Map
 import           Data.Function  --  `on` 函数
 
@@ -559,3 +558,17 @@ yourOrderPlease  = unwords . sortOn(find isDigit) . words
 -- get unique number
 getUnique::[Int]->Int
 getUnique = head . concat . filter ((== 1) . length) . group . sort 
+
+
+
+legMass :: (Int,Int) -> (Int,Int) -> (Int,Int) -> Bool -> String
+legMass (yd,ys) (t1d,t1s) (t2d,t2s) isBroken = if isBroken 
+        then fst . last $ sortOn (\(_,x) -> x ) [("t2",t2s),("t1",t1s),("y",ys)]
+        else fst . head $ sortOn (\(_,x) -> x ) [("y",y),("t1",t1),("t2",t2)]
+        where 
+            dd :: Int -> Int -> Float
+            dd d s = if s == 0 then 0.0 else fromIntegral d / fromIntegral s
+            y = dd yd ys
+            t1 = dd t1d t1s
+            t2 = dd t2d t2s
+    

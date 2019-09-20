@@ -1,4 +1,3 @@
-
 {-# LANGUAGE TemplateHaskell #-}
 import           Control.Applicative -- Const
 import           Control.Monad -- MonadPlus , guard
@@ -7,9 +6,14 @@ import           Control.Monad.Writer
 import           Control.Monad.State
 import           Control.Monad.Identity
 import           Data.Char
-import           Text.Parsec
 import           Language.Haskell.TH
+import           Debug.Trace
 
+-- import           Text.Parsec
+data Book = Book { 
+        bid::Int, 
+        bname::String 
+} deriving(Show,Read,Eq)
 
 isPassValid::String -> Bool
 isPassValid s = length s >= 8 && check s
@@ -70,11 +74,10 @@ whenTest :: Int -> IO ()
 whenTest a = when (a > 5) $ putStrLn "larger than 5"
 
 -- mklen:: DecsQ
-mklen::IO()
+mklen::Q()
 mklen = do
-        -- TyConI (DataD _ _ [] _ cons _) <- reify ''Book
-        putStrLn $ $(reify ''Book >>= stringE .pprint)
-        -- [RecC conName fields] <- return cons
-        -- forM fields $ \(fileName,_,fileType) -> do
-            -- putStrLn (nameBase fileName) 
+        TyConI (DataD _ _ _ _ cons _) <- reify ''Book
+        [RecC conName fields] <- return cons
+        let names = forM fields (\(fileName,_,fileType) -> print $ show $ (nameBase fileName) >> return fileName)
         return ()
+-- TyConI (DataD [] Ghci1.Book [] Nothing [RecC Ghci1.Book [(Ghci1.bid,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Types.Int),(Ghci1.bname,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Base.String)]] [])
