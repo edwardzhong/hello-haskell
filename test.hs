@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Identity
@@ -8,6 +8,8 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Writer
 import Data.Char
 import Language.Haskell.TH
+-- import Data.Typeable
+import GHC.Generics
 
 -- import           Text.Parsec
 data Book =
@@ -15,7 +17,7 @@ data Book =
         { bid :: Int
         , bname :: String
         }
-    deriving (Show, Read, Eq)
+    deriving (Generic, Show, Read, Eq)
 
 isPassValid :: String -> Bool
 isPassValid s = length s >= 8 && check s
@@ -81,3 +83,5 @@ ref = do
     [RecC conName fields] <- return cons
     return $ (\(fileName, _, fileType) -> nameBase fileName) <$> fields
 -- TyConI (DataD [] Ghci1.Book [] Nothing [RecC Ghci1.Book [(Ghci1.bid,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Types.Int),(Ghci1.bname,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Base.String)]] [])
+
+    
