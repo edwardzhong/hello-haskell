@@ -1,11 +1,12 @@
 module UI
     ( mainUI
     ) where
-import           Control.Monad
-import           Data.Char
-import           Data.List
-import           Model
-import qualified Data.Map             as Map
+
+import Control.Monad
+import Data.Char
+import Data.List
+import qualified Data.Map as Map
+import Model
 
 title = "Book Management System (Haskell)"
 mainDispatch = [('i',"Initialization",initialize)
@@ -108,8 +109,8 @@ allBookUI = getBook >>= showBook >> bookUI
 
 searchBookUI = do
     putStr "Please input Keyword:"
-    books <- searchBook =<< getLine
-    if null books then putStrLn "No match result"
+    books <- searchBook =<< map toLower <$> getLine
+    if null books then putStrLn "No match result" >> bookUI
     else showBook books >> bookUI
 
 borrowUI = renderUI borrowDispatch

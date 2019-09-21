@@ -1,31 +1,29 @@
 module Model
     ( User(..)
-     ,Book(..)
-     ,initFile
-     ,initial
-     ,searchUser
-     ,addUser
-     ,deleteUser
-     ,searchBook
-     ,addBook
-     ,deleteBook
-     ,getUser
-     ,getBook
-     ,borrowBook
-     ,returnBook
+    , Book(..)
+    , initFile
+    , initial
+    , searchUser
+    , addUser
+    , deleteUser
+    , searchBook
+    , addBook
+    , deleteBook
+    , getUser
+    , getBook
+    , borrowBook
+    , returnBook
     ) where
-import           Control.Exception
-import           Control.Monad
-import           Control.Monad.Writer
--- import           Control.Monad.Trans.Class
-import           Control.Monad.Trans.Maybe
-import           Data.Char
-import           Data.List
-import           System.IO
-import           System.IO.Error
-import           System.Directory
-import           Text.Regex.Posix
 
+import Control.Exception
+import Control.Monad
+import Control.Monad.Writer
+import Control.Monad.Trans.Maybe
+import Data.Char
+import Data.List
+import System.Directory
+import System.IO
+import System.IO.Error
 
 data Book = Book {
    bID::Int,
@@ -57,13 +55,17 @@ userPath = "user.txt"
 bookPath = "book.txt"
 
 -- 初始数据
-initUsers = [User{uID=0,uName="admin",role=Admin,password="8888",borrow=[]}]
-initBooks = [Book{bID=0,bName="Learn You a Haskell for Great Good!",cate="Haskell",num=5}
-        ,Book{bID=1,bName="Real World Haskell",cate="Haskell",num=5}
-        ,Book{bID=2,bName="JavaScript框架设计",cate="javaScript",num=5}
-        ,Book{bID=3,bName="JavaScript高级程序设计",cate="javaScript",num=5}
-        ,Book{bID=4,bName="CLR via C#",cate="C#",num=5}
-        ,Book{bID=5,bName="ASP.NET设计模式",cate="C#",num=5}]
+initUsers = [User {uID = 0, uName = "admin", role = Admin, password = "8888", borrow = []}]
+
+initBooks =
+    [ Book {bID = 0, bName = "Learn You a Haskell for Great Good!", cate = "Haskell", num = 5}
+    , Book {bID = 1, bName = "Real World Haskell", cate = "Haskell", num = 5}
+    , Book {bID = 2, bName = "JavaScript框架设计", cate = "JavaScript", num = 5}
+    , Book {bID = 3, bName = "JavaScript高级程序设计", cate = "JavaScript", num = 5}
+    , Book {bID = 4, bName = "CLR via C#", cate = "C#", num = 5}
+    , Book {bID = 5, bName = "ASP.NET设计模式", cate = "C#", num = 5}
+    ]
+
 
 getUser::IO [User]
 getUser = read <$> readFile userPath -- <$> 就是中缀版的 fmap
@@ -147,7 +149,7 @@ searchBook::String -> IO [Book]
 searchBook n = do
         books <- getBook
         -- return $ filter (\Book {bID=id,bName=name,cate=cat} -> show id == n || isPrefixOf n cat) books
-        return [ book| book@Book {bID=id,bName=name,cate=cat} <- books, show id == n || isPrefixOf n cat || (n =~ name :: Bool)]
+        return [ book| book@Book {bID=id,bName=name,cate=cat} <- books, show id == n || isPrefixOf n (map toLower cat) || isInfixOf n (map toLower name) ]
 
 addBook::(String,String,Int)->IO [Book]
 addBook (name,cat,n) = do
