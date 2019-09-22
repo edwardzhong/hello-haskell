@@ -19,6 +19,9 @@ data Book =
         }
     deriving (Generic, Show, Read, Eq)
 
+main :: IO ()
+main = putStrLn "this is test"
+
 isPassValid :: String -> Bool
 isPassValid s = length s >= 8 && check s
   where
@@ -84,4 +87,3 @@ ref = do
     return $ (\(fileName, _, fileType) -> nameBase fileName) <$> fields
 -- TyConI (DataD [] Ghci1.Book [] Nothing [RecC Ghci1.Book [(Ghci1.bid,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Types.Int),(Ghci1.bname,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Base.String)]] [])
 
-    
