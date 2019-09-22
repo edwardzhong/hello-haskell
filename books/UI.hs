@@ -39,8 +39,7 @@ x |> f = f x
 
 renderUI list = do
     putStrLn $ replicate 40 '='
-    -- putStr $ replicate ((40 - (length title)) `div` 2) ' '
-    putStr $ replicate ((`div` 2) . (40-) $ length title) ' ' 
+    putStr $ replicate ((40 - ) (length title) `div` 2) ' '
     putStrLn $ title ++ "\n"
     putStrLn $ unlines [(' ' <$ [1..8]) ++ x:" - " ++ y|(x,y,_)<-list]
     -- mapM_ (\(x,y,_) -> putStrLn $ replicate 8 ' ' ++ x:" - " ++ y) list

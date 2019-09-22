@@ -348,21 +348,21 @@ getUnique = head . concat . filter ((== 1) . length) . group . sort
 
 -- legMass :: (Int,Int) -> (Int,Int) -> (Int,Int) -> Bool -> String
 -- legMass (yd,ys) (t1d,t1s) (t2d,t2s) isBroken = if isBroken 
---         then fst . last $ sortOn (\(_,x) -> x ) [("t2",t2s),("t1",t1s),("y",ys)]
---         else fst . head $ sortOn (\(_,x) -> x ) [("y",y),("t1",t1),("t2",t2)]
---         where 
---             fdiv :: Int -> Int -> Float
---             fdiv d s = if s == 0 then 0.0 else fromIntegral d / fromIntegral s
---             y = fdiv yd ys
---             t1 = fdiv t1d t1s
---             t2 = fdiv t2d t2s
+--     then fst . last $ sortOn (\(_,x) -> x ) [("t2",t2s),("t1",t1s),("y",ys)]
+--     else fst . head $ sortOn (\(_,x) -> x ) [("y",y),("t1",t1),("t2",t2)]
+--     where 
+--         fdiv :: Int -> Int -> Float
+--         fdiv d s = if s == 0 then 0.0 else fromIntegral d / fromIntegral s
+--         y = fdiv yd ys
+--         t1 = fdiv t1d t1s
+--         t2 = fdiv t2d t2s
 
 legMass :: (Int,Int) -> (Int,Int) -> (Int,Int) -> Bool -> String
 legMass (yd,ys) (t1d,t1s) (t2d,t2s) isBroken = if isBroken
-        then str maximum [ys,t1s,t2s]
-        else str minimum [fdiv yd ys,fdiv t1d t1s,fdiv t2d t2s]
-        where 
-            fdiv :: Int -> Int -> Float
-            fdiv d s = fromIntegral d / fromIntegral s
-            str ::Ord a => ( [a] -> a ) -> [a] -> String
-            str f xs = case f xs `elemIndex` xs of Just i -> ["y","t1","t2"] !! i
+    then pos maximum [ys,t1s,t2s]
+    else pos minimum [fdiv yd ys,fdiv t1d t1s,fdiv t2d t2s]
+    where 
+        fdiv :: Int -> Int -> Float
+        fdiv d s = fromIntegral d / fromIntegral s
+        pos ::Ord a => ( [a] -> a ) -> [a] -> String
+        pos f xs = case f xs `elemIndex` xs of Just i -> ["y","t1","t2"] !! i
