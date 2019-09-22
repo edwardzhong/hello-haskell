@@ -96,31 +96,35 @@ saveBook = save bookPath
 
 
 -- 保存到临时文件.temp再改名,避免同时操作文件锁定的问题
-save::Show a => FilePath -> a -> IO ()
+save :: Show a => FilePath -> a -> IO ()
 save path x = do
-        (name, handle) <- openTempFile "." "temp"
-        hPutStr handle $ show x
-        hClose handle
-        removeFile path
-        renameFile name path
+    (name, handle) <- openTempFile "." "temp"
+    hPutStr handle $ show x
+    hClose handle
+    removeFile path
+    renameFile name path
+
 
 clearFile :: IO [Char]
-clearFile = do 
-        doesFileExist userPath >>= \exist -> if exist then removeFile userPath >> return "Remove user file" else return "User file not exist !"
-        bookExist <- doesFileExist bookPath
-        case bookExist of 
-             True -> removeFile bookPath >> return "Remove book file"
-             otherwise -> return "Book file not exist !"
+clearFile = do
+    doesFileExist userPath >>= \exist ->
+        if exist then removeFile userPath >> return "Remove user file"
+        else return "User file not exist !"
+    bookExist <- doesFileExist bookPath
+    case bookExist of
+        True -> removeFile bookPath >> return "Remove book file"
+        otherwise -> return "Book file not exist !"
+
 
 initFile :: IO ()
 initFile = do 
-        handle <- openFile userPath ReadWriteMode -- openFile 方式
-        hPutStr handle $ show initUsers
-        hClose handle
-        withFile bookPath ReadWriteMode (\handle -> do 
-            hPutStr handle $ show initBooks 
-            hClose handle) -- withFile 方式
-        -- appendFile fileName ""
+    handle <- openFile userPath ReadWriteMode -- openFile 方式
+    hPutStr handle $ show initUsers
+    hClose handle
+    withFile bookPath ReadWriteMode (\handle -> do 
+        hPutStr handle $ show initBooks 
+        hClose handle) -- withFile 方式
+    -- appendFile fileName ""
 
 initial = clearFile >> initFile
 
@@ -129,35 +133,35 @@ searchUser n = getUser >>= filterM (\User {uID=id,uName=name} -> return $ show i
 
 addUser::(String,String) -> IO [User]
 addUser (name,pass) = do
-        users <- getUser
-        let nid = head $ [1..100] \\ [id|User{uID=id} <- users]
-            user = User{uID=nid,uName=name,role=Guest,password=pass,borrow=[]}
-        saveData $ Users $ user:users
-        return [user]
+    users <- getUser
+    let nid = succ $ maximum [ id | User{uID=id} <- users ]
+        user = User{uID=nid,uName=name,role=Guest,password=pass,borrow=[]}
+    saveData $ Users $ user:users
+    return [user]
 
 deleteUser::String -> IO (Either String String)
 deleteUser id = do
-        users <- getUser
-        case find (\User{uID=x} -> show x == id) users of
-            Nothing -> return $ Left "User not exist !"
-            Just user -> do 
-                -- saveUser  [ u | u@User{uID=x} <- users, show x /= id ]
-                saveData $ Users [ u | u@User{uID=x} <- users, show x /= id ]
-                return . Right $ uName user ++ " had been Successful deleted !"
+    users <- getUser
+    case find (\User{uID=x} -> show x == id) users of
+        Nothing -> return $ Left "User not exist !"
+        Just user -> do 
+            -- saveUser  [ u | u@User{uID=x} <- users, show x /= id ]
+            saveData $ Users [ u | u@User{uID=x} <- users, show x /= id ]
+            return . Right $ uName user ++ " had been Successful deleted !"
 
 searchBook::String -> IO [Book]
 searchBook n = do
-        books <- getBook
-        -- return $ filter (\Book {bID=id,bName=name,cate=cat} -> show id == n || isPrefixOf n cat) books
-        return [ book| book@Book {bID=id,bName=name,cate=cat} <- books, show id == n || isPrefixOf n (map toLower cat) || isInfixOf n (map toLower name) ]
+    books <- getBook
+    -- return $ filter (\Book {bID=id,bName=name,cate=cat} -> show id == n || isPrefixOf n cat) books
+    return [ book| book@Book {bID=id,bName=name,cate=cat} <- books, show id == n || isPrefixOf n (map toLower cat) || isInfixOf n (map toLower name) ]
 
 addBook::(String,String,Int)->IO [Book]
 addBook (name,cat,n) = do
-        books <- getBook
-        let nid = head $ [1..100] \\ (foldr (\Book{bID=id} x -> id:x) [] books)
-            book = Book{bID=nid,bName=name,cate=cat,num= n}
-        saveData $ Books $ book:books
-        return [book]
+    books <- getBook
+    let nid = head $ [1..100] \\ (foldr (\Book{bID=id} x -> id:x) [] books)
+        book = Book{bID=nid,bName=name,cate=cat,num= n}
+    saveData $ Books $ book:books
+    return [book]
 
 -- newtype EitherT m a = EitherT { runEitherT :: m (Either a)}
 -- bindMT :: (Monad m) => EitherT m a -> (a -> EitherT m b) -> EitherT m b
@@ -194,53 +198,53 @@ addBook (name,cat,n) = do
 -- runWriterT . runMaybeT $ delBook "2"
 delBook::String -> MaybeT (WriterT String IO) ()
 delBook id = do
-        books <- liftIO getBook
-        case find (\Book{bID=x} -> show x == id) books of
-            Nothing -> tell "book not exist !" >> fail "err"
-            Just book -> do
-                -- liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
-                liftIO $ saveData $ Books [ b | b@Book{ bID = x } <- books, show x /= id ]
-                tell $ "《" ++ bName book ++ "》had been Successful deleted !"
+    books <- liftIO getBook
+    case find (\Book{bID=x} -> show x == id) books of
+        Nothing -> tell "book not exist !" >> fail "err"
+        Just book -> do
+            -- liftIO $ saveBook $ filter (\Book{bID=x} -> show x /= id) books 
+            liftIO $ saveData $ Books [ b | b@Book{ bID = x } <- books, show x /= id ]
+            tell $ "《" ++ bName book ++ "》had been Successful deleted !"
 
 deleteBook::String -> IO (Either String String)
 deleteBook id = do
-        books <- getBook
-        case find (\Book{bID=x} -> show x == id) books of
-            -- Nothing -> putStrLn "Book not exist !" >> return False
-            Nothing -> return $ Left "Book not exist !"
-            Just book -> do 
-                saveBook $ filter (\Book{bID=x} -> show x /= id) books 
-                -- putStrLn $ "《" ++ bName book ++ "》had been Successful deleted !"
-                return . Right $ "《" ++ bName book ++ "》had been Successful deleted !"
+    books <- getBook
+    case find (\Book{bID=x} -> show x == id) books of
+        -- Nothing -> putStrLn "Book not exist !" >> return False
+        Nothing -> return $ Left "Book not exist !"
+        Just book -> do 
+            saveBook $ filter (\Book{bID=x} -> show x /= id) books 
+            -- putStrLn $ "《" ++ bName book ++ "》had been Successful deleted !"
+            return . Right $ "《" ++ bName book ++ "》had been Successful deleted !"
 
 borrowBook::(Int,Int) -> IO (Either String String)
 borrowBook (uid,bid) = do 
-        users <- getUser
-        books <- getBook
-        case find (\User {uID=id} -> id == uid) users of 
-            Nothing -> return $ Left "User not exist !"
-            Just user -> case findIndex (\Book {bID=id} -> id == bid) (borrow user) of
-                Just index -> return $ Left "User already borrowed the book !"
-                Nothing -> case find (\Book {bID=id} -> id == bid) books of
-                    Nothing -> return $ Left "Book not exist !"
-                    Just book -> do 
-                        if num book <= 0 then return $ Left "The book has been borrowed !"
-                        else do 
-                            saveData $ Books [if id == bid then book {num = n-1} else book | book@Book {bID=id,num=n} <- books] -- 和map或<$>功能一样
-                            saveData $ Users $ (\user@User{uID=id,borrow=bs} -> if id == uid then user{borrow = book:bs} else user) <$> users
-                            return . Right $ uName user ++ " borrow《"++ (bName book) ++ "》success!"
+    users <- getUser
+    books <- getBook
+    case find (\User {uID=id} -> id == uid) users of 
+        Nothing -> return $ Left "User not exist !"
+        Just user -> case findIndex (\Book {bID=id} -> id == bid) (borrow user) of
+            Just index -> return $ Left "User already borrowed the book !"
+            Nothing -> case find (\Book {bID=id} -> id == bid) books of
+                Nothing -> return $ Left "Book not exist !"
+                Just book -> do 
+                    if num book <= 0 then return $ Left "The book has been borrowed !"
+                    else do 
+                        saveData $ Books [if id == bid then book {num = n-1} else book | book@Book {bID=id,num=n} <- books] -- 和map或<$>功能一样
+                        saveData $ Users $ (\user@User{uID=id,borrow=bs} -> if id == uid then user{borrow = book:bs} else user) <$> users
+                        return . Right $ uName user ++ " borrow《"++ (bName book) ++ "》success!"
    
 returnBook::(Int,Int) -> IO (Either String String) 
 returnBook (uid,bid) = do 
-        users <- getUser
-        books <- getBook
-        case find (\User{uID=id} -> id == uid) users of 
-            Nothing -> return $ Left "User not exist !"
-            Just user -> case findIndex (\Book {bID=id} -> id == bid) (borrow user) of
-                Nothing -> return $ Left "User not borrow the Book !"
-                Just index -> case find (\Book {bID=id} -> id == bid) books of
-                    Nothing -> return $ Left "Book not exist !"
-                    Just book -> do 
-                        saveData $ Books [if id == bid then book {num = n+1} else book | book@Book{bID=id,num=n} <- books]
-                        saveData $ Users [if id == uid then user {borrow = filter (\Book{bID=id} -> id /= bid) bs} else user | user@User{uID=id,borrow=bs} <- users]
-                        return . Right $ uName user ++ " return《"++ (bName book) ++ "》success!"
+    users <- getUser
+    books <- getBook
+    case find (\User{uID=id} -> id == uid) users of 
+        Nothing -> return $ Left "User not exist !"
+        Just user -> case findIndex (\Book {bID=id} -> id == bid) (borrow user) of
+            Nothing -> return $ Left "User not borrow the Book !"
+            Just index -> case find (\Book {bID=id} -> id == bid) books of
+                Nothing -> return $ Left "Book not exist !"
+                Just book -> do 
+                    saveData $ Books [if id == bid then book {num = n+1} else book | book@Book{bID=id,num=n} <- books]
+                    saveData $ Users [if id == uid then user {borrow = filter (\Book{bID=id} -> id /= bid) bs} else user | user@User{uID=id,borrow=bs} <- users]
+                    return . Right $ uName user ++ " return《"++ (bName book) ++ "》success!"
