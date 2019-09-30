@@ -68,7 +68,7 @@ safe y (x:xs) n = y /= x && y /= x + n && y /= x - n && safe y xs (n + 1)
 {- MonadReader -}
 -- r 就是输入的全局参数
 -- newtype Reader r a = Reader {runReader::r -> a}
--- -- runReader m 提取出函数fun, 再 fun r 获得 a 值 
+-- -- runReader m 提取出函数fun, 再传递参数 r 获得结果 a 
 -- instance Functor(Reader r) where
 --     fmap f m = Reader $ \r -> f(runReader m r)
 
@@ -82,11 +82,11 @@ safe y (x:xs) n = y /= x && y /= x + n && y /= x - n && safe y xs (n + 1)
 
 {- 使用reader的方式, Reader a b 与 a->b 是同构的 -}
 -- headT::Reader String String
--- headT =Reader $ \name -> "Welcome "++ name ++ ".\n"
+-- headT = Reader $ \name -> "Welcome "++ name ++ ".\n"
 -- bodyT::Reader String String
--- bodyT= Reader $ \name -> "Welcome to my home, "++name ++". this is best home you can ever find on this planet.\n"
+-- bodyT = Reader $ \name -> "Welcome to my home, "++name ++". this is best home you can ever find on this planet.\n"
 -- footT::Reader String String
--- footT= Reader $ \name -> "Now, help yourself, "++name++".\n"
+-- footT = Reader $ \name -> "Now, help yourself, "++name++".\n"
 
 -- data Greet = Greet{
 --     greetHead::String,
