@@ -142,12 +142,18 @@ addUser (name,pass) = do
 deleteUser::String -> IO (Either String String)
 deleteUser id = do
     users <- getUser
+    books <- getBook
     case find (\User{uID=x} -> show x == id) users of
         Nothing -> return $ Left "User not exist !"
         Just user -> do 
-            -- saveUser  [ u | u@User{uID=x} <- users, show x /= id ]
+            saveData $ Books $ (\book@Book{ bID = bid, num = n } -> if findBorrowBook bid user then book{ num = n + 1 } else book) <$> books
             saveData $ Users [ u | u@User{uID=x} <- users, show x /= id ]
             return . Right $ uName user ++ " had been Successful deleted !"
+
+findBorrowBook id user = do
+    case find (\Book{bID = x } -> x == id) (borrow user) of
+        Nothing -> False
+        Just book -> True
 
 searchBook::String -> IO [Book]
 searchBook n = do

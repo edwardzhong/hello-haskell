@@ -87,3 +87,4 @@ ref = do
     return $ (\(fileName, _, fileType) -> nameBase fileName) <$> fields
 -- TyConI (DataD [] Ghci1.Book [] Nothing [RecC Ghci1.Book [(Ghci1.bid,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Types.Int),(Ghci1.bname,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Base.String)]] [])
 
+
