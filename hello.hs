@@ -17,18 +17,6 @@ import           Data.Function  --  `on` 函数
 
 
 {-===================== 算法 =====================-}
--- 插入排序
-insertSort [] = []
-insertSort (x:xs) = insert x $ insertSort xs
-    where insert x [] = [x]
-          insert x (y:ys) | x < y = x:y:ys
-                          | otherwise = y:insert x ys
-
--- 选择排序
-selectSort [] = []
-selectSort xs = let x = minimum xs 
-    in x:selectSort (delete x xs)
-
 -- 冒泡排序
 bubbleSort xs | swap xs == xs = xs -- 已经排好序的情况
               | otherwise = bubbleSort $ swap xs
@@ -41,6 +29,18 @@ bubbleSort xs | swap xs == xs = xs -- 已经排好序的情况
 quickSort [] = []
 quickSort [x] = [x]
 quickSort (x:xs) = quickSort [ y | y <- xs, y <= x ] ++ [x] ++ quickSort [ y | y <- xs, y > x ]
+
+-- 插入排序
+insertSort [] = []
+insertSort (x:xs) = insert x $ insertSort xs
+    where insert x [] = [x]
+          insert x (y:ys) | x < y = x:y:ys
+                          | otherwise = y:insert x ys
+
+-- 选择排序
+selectSort [] = []
+selectSort xs = let x = minimum xs 
+    in x:selectSort $ delete x xs
 
 -- 归并排序
 mergeSort xs = merge (mergeSort x) (mergeSort y)
