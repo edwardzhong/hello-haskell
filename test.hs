@@ -1,5 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Identity
@@ -8,6 +9,7 @@ import Control.Monad.Trans.Maybe
 import Control.Monad.Writer
 import Data.Char
 import Language.Haskell.TH
+
 -- import Data.Typeable
 import GHC.Generics
 
@@ -86,5 +88,3 @@ ref = do
     [RecC conName fields] <- return cons
     return $ (\(fileName, _, fileType) -> nameBase fileName) <$> fields
 -- TyConI (DataD [] Ghci1.Book [] Nothing [RecC Ghci1.Book [(Ghci1.bid,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Types.Int),(Ghci1.bname,Bang NoSourceUnpackedness NoSourceStrictness,ConT GHC.Base.String)]] [])
-
-
