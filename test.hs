@@ -45,6 +45,7 @@ setPassword = do
     return pass
 
 --runMaybeT setPassword
+
 push :: Int -> MaybeT (State [Int]) Int
 -- push x = MaybeT $ state $ \xs -> (Just x,x:xs)
 push x = do
