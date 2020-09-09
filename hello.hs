@@ -370,16 +370,3 @@ legMass (yd, ys) (t1d, t1s) (t2d, t2s) isBroken =
         case f xs `elemIndex` xs of
             Just i -> ["y", "t1", "t2"] !! i
 
-
-diffTailNum :: [Int] -> Int
-diffTailNum arr = length $ filter (\x -> x /= last arr) arr
-
-swapHeadTail :: ([Int], [Int]) -> ([Int], [Int])
-swapHeadTail ([], y) = ([], y)
-swapHeadTail (x, []) = (x, [])
-swapHeadTail (x, y) = (last y : tail x, init y ++ [head x])
-
-headTailEqual :: [Int] -> [Int] -> Bool
-headTailEqual [] _ = True
-headTailEqual _ [] = True
-headTailEqual x y = head x + head y == last x + last y
